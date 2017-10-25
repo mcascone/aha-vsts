@@ -1,0 +1,2 @@
+curl --request GET \
+  --url 'http://{{AHA_URL}}/releases/{{AHA_REL}}/
