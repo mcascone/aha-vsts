@@ -17,15 +17,106 @@ Get the metadata for the release you want to put the feature into. Use any AHA_N
 ```javascript
 GET {{AHA_URL}}/releases/{{AHA_REL}}/
 ```
+Postman test code to capture return data:
+```javascript
+var jsonData = JSON.parse(responseBody);
+
+postman.setGlobalVariable("AHA_REL_ID", jsonData.release.id);
+
+// needed to get the integration
+postman.setGlobalVariable("AHA_PROD_ID", jsonData.release.product_id);
+```
+
 ---
 ### GET get tfs item info
 ```javascript
 GET {{VSTS_URL}}/workitems/{{VSTS_ID}}?api-version=1.0&$expand=none
 ```
+Postman test code to capture return data:
+```javascript
+var jsonData = JSON.parse(responseBody);
+
+postman.setGlobalVariable("TFS_NAME", jsonData.fields["System.Title"]);
+
+// Get the assignee and strip out the email address
+var assigned = jsonData.fields["System.AssignedTo"].split(" <")[0];
+postman.setGlobalVariable("TFS_ASSIGNED_TO", assigned);
+
+
+// if this comes out as undefined, need to use the set function to set a blank desc.
+// Otherwise, updating TFS from AHA will not work (TFS will fail the request from AHA).
+// Would be better to catch this and send a description automatically.
+// postman.setGlobalVariable("TFS_DESC", JSON.stringify(jsonData.fields["System.Description"]));
+// postman.setGlobalVariable("TFS_DESC_PARSED", JSON.parse(postman.getGlobalVariable("TFS_DESC")));
+postman.setGlobalVariable("TFS_DESC", jsonData.fields["System.Description"]);
+
+var tfsState = jsonData.fields["System.State"];
+var ahaState;
+
+var tfsType = jsonData.fields["System.WorkItemType"];
+var ahaFeatType;
+
+switch (tfsState) {
+    case "Ready": 
+        ahaState = "Backlog";
+        break;
+
+    case "Active":
+        ahaState = "In Development";
+        break;
+    
+    case "Resolved":
+        ahaState = "Ready To Ship";
+        break;
+        
+    case "In UAT":
+        ahaState = "In UAT";
+        break;
+        
+    case "Closed":
+        ahaState = "Shipped";
+        break;
+        
+    default:
+        ahaState = "Backlog";
+}
+
+if ( (jsonData.fields["System.BoardColumn"] == "Active") && (jsonData.fields["System.BoardColumnDone"] === true)) {
+        ahaState = "In QA";
+}
+
+
+switch (tfsType) {
+    case "Bug":
+        ahaFeatType = "Bug";
+        // the body of the item is in a different place for TFS Bugs
+        postman.setGlobalVariable("TFS_DESC", jsonData.fields["Microsoft.VSTS.TCM.ReproSteps"]);
+        break;
+    
+    default:
+        ahaFeatType = "Enhancement";
+}
+
+postman.setGlobalVariable("AHA_STATE", ahaState);
+postman.setGlobalVariable("AHA_FEAT_TYPE", ahaFeatType);
+```
+
+
 ---
 ### GET get aha integration id
 ```javascript
 GET {{AHA_URL}}/products/{{AHA_PROD_ID}}/integrations
+```
+Postman Test code to capture return data
+```javascript
+var jsonData = JSON.parse(responseBody);
+
+// there might be multiple integrations, so only find the one for TFS
+for (var i in jsonData.integrations) {
+    if (jsonData.integrations[i].service_name === "tfs") {
+        postman.setGlobalVariable("AHA_INT_ID", jsonData.integrations[i].id);
+    }
+}
 ```
 ---
 ### POST Create Aha Feature w/TFS info
@@ -47,6 +138,15 @@ BODY
 	"description": "{{TFS_DESC}}"
 }
 ```
+Postman Test code - captures return data
+```javascript
+var jsonData = JSON.parse(responseBody);
+
+// capture the new feature's reference number
+postman.setGlobalVariable("AHA_NUM", jsonData.feature.reference_num);
+postman.setGlobalVariable("AHA_ITEM_URL", jsonData.feature.url);
+```
+
 
 ---
 ### POST add tfs link to aha
