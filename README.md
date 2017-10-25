@@ -1,13 +1,12 @@
-# aha-vsts
-API commands used to integrate VSTS and Aha! in ways the native integration doesn't do.
+# API commands used to integrate VSTS and Aha! in ways the native integration doesn't do.
 
 ## Workflow:
 1. Get the Aha release you want to add the new feature to.
 2. Create new feature in AHA.
-3. Create the TFS integration link in it, pointing to the VSTS item.
-  * This can be run on an existing Aha item to create the integration link to VSTS.
+3. Create the VSTS integration link in it, pointing to the VSTS item.
+    * This can be run on an existing Aha item to create the integration link to VSTS.
 5. Update the VSTS item with the AHA-ID and a link to it.
-6. Add a blank description to the TFS item if necessary - Aha requires this field to exist for the integration to work.
+6. Add a blank description to the VSTS item if necessary - Aha requires this field to exist for the integration to work.
 
 
 ----
