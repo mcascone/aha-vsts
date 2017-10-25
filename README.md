@@ -10,4 +10,5 @@ Get the metadata for the release you want to put the feature into. Use any AHA_N
 
 ## GET get tfs item info
 ```java
-{{VSTS_URL}}/workitems/{{VSTS_ID}}?api-version=1.0&$expand=none```
+{{VSTS_URL}}/workitems/{{VSTS_ID}}?api-version=1.0&$expand=none
+```
