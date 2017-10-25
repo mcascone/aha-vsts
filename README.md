@@ -10,23 +10,24 @@
 
 
 ----
+---
 
-### get aha release fields
+### GET get aha release fields
 Get the metadata for the release you want to put the feature into. Use any AHA_NUM from that release.
 ```javascript
 GET {{AHA_URL}}/releases/{{AHA_REL}}/
 ```
-
+---
 ### GET get tfs item info
 ```javascript
 GET {{VSTS_URL}}/workitems/{{VSTS_ID}}?api-version=1.0&$expand=none
 ```
-
-### get aha integration id
+---
+### GET get aha integration id
 ```javascript
 GET {{AHA_URL}}/products/{{AHA_PROD_ID}}/integrations
 ```
-
+---
 ### POST Create Aha Feature w/TFS info
 Creates a new feature in the Aha release specified in the previous step. Captures the new feature num in {{AHA_NUM}}
 ```javascript
@@ -47,9 +48,9 @@ BODY
 }
 ```
 
-
-### add tfs link to aha
-```java
+---
+### POST add tfs link to aha
+```javascript
 POST {{AHA_URL}}/{{AHA_TYPE}}s/{{AHA_NUM}}/integrations/{{AHA_INT_ID}}/fields
 ```
 BODY
@@ -68,10 +69,10 @@ BODY
 }
 ```
 
- 
-### add link and aha field to tfs
+---
+### PATCH add link and aha field to tfs
 This seems to break the state linkage if it's in a state that doesn't line up well between the two. Mostly based on the split columns, they don't map well. Double check that it doesn't slip when using this one.
-```json
+```javascript
 PATCH {{VSTS_URL}}/DefaultCollection/_apis/wit/workitems/{{VSTS_ID}}?api-version=1.0
 ```
 BODY
@@ -92,10 +93,10 @@ BODY
   }
 ]
 ```
-
-### add blank description to tfs
+---
+### PATCH add blank description to tfs
 In cases where there's no Decription info in TFS for Aha to pull in, the call fails. This is a quick way to add a blank character to the TFS item so the other API calls go through.
-```json
+```javascript
 PATCH {{VSTS_URL}}/DefaultCollection/_apis/wit/workitems/{{VSTS_ID}}?api-version=1.0
 ```
 BODY
